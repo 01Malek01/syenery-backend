@@ -20,10 +20,10 @@ router.get(
   }),
   (req, res, next) => {
     // Log if authentication was successful
-    console.log("Authentication successful:", req.isAuthenticated());
+    // console.log("Authentication successful:", req.isAuthenticated());
 
     // Log the user object to check if the user was correctly authenticated
-    console.log("User object:", req.user);
+    // console.log("User object:", req.user);
 
     if (req.isAuthenticated()) {
       // Attempt to save the session
@@ -34,7 +34,7 @@ router.get(
         }
 
         // Log the session ID if it exists
-        console.log("Session ID:", req.sessionID);
+        // console.log("Session ID:", req.sessionID);
 
         // Successful authentication, redirect to your frontend
         res.redirect(process.env.FRONTEND_URL);
@@ -62,12 +62,14 @@ router.post(
         return next(err);
       }
     });
-    res.sendStatus(200);
+
+    res.clearCookie("connect.sid", { path: "/" });
+    res.send("Logged out successfully");
     return next();
   })
 );
 
-router.get("/check-auth", (req, res) => {
+router.get("/check-auth", passport.authenticate("session"), (req, res) => {
   if (req.isAuthenticated()) {
     res.send({
       _id: req.user._id,

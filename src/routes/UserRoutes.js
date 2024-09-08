@@ -1,14 +1,27 @@
 import express from "express";
-// import passport from "passport";
-import passport, {
+import passport from "passport";
+import {
+  editProfile,
   getProfile,
-  register,
-} from "../controllers/AuthController.js";
-import expressAsyncHandler from "express-async-handler";
-
+  uploadProfilePic,
+} from "../controllers/UserController.js";
+import { upload } from "../../config/multer.js";
 const router = express.Router();
 
+router.get(
+  "/profile",
+  passport.authenticate("session"),
+  (req, res) => {
+    res.send("authenticated", req.user);
+  },
+  getProfile
+);
+router.put("/profile", passport.authenticate("session"), editProfile);
 
-
-router.get("/profile", passport.authenticate("session"), getProfile);
+router.post(
+  "/profile/uploadProfilePic",
+  passport.authenticate("session"),
+  upload.single("profilePic"),
+  uploadProfilePic
+);
 export default router;

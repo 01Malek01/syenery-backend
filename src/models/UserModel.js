@@ -20,6 +20,21 @@ const userSchema = new mongoose.Schema(
     googleId: {
       type: String,
     },
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    profilePic: {
+      type: String,
+    },
   },
   {
     timestamps: true,

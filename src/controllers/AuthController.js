@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import User from "../models/UserModel.js";
 import expressAsyncHandler from "express-async-handler";
-import GoogleStrategy from "passport-google-oidc";
+import GoogleStrategy from "passport-google-oauth2";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -38,7 +38,7 @@ passport.use(
         "http://localhost:5000/api/v1/auth/federated/google/callback",
       scope: ["email", "profile"],
     },
-    async (issuer, profile, done) => {
+    async (accessToken, refreshToken, profile, done) => {
       try {
         // Check if a user with the Google ID already exists
         let user = await User.findOne({ googleId: profile.id });
@@ -91,18 +91,4 @@ export const register = expressAsyncHandler(async (req, res, next) => {
   }
 });
 
-export const getProfile = expressAsyncHandler(async (req, res, next) => {
-  console.log(req.user);
-  const user = await User.findById(req?.user?._id);
-  if (user) {
-    res.json({
-      name: user.name,
-      email: user.email,
-    });
-    return next();
-  } else {
-    res.status(404);
-    throw new Error("User not found");
-  }
-});
 export default passport;
