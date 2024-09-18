@@ -10,12 +10,17 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    private: {
+      type: Boolean,
+      default: false,
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
     likes: {
       type: Number,
+      default: 0,
     },
     comments: [
       {

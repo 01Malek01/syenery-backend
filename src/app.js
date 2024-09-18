@@ -4,13 +4,18 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import session from "express-session";
-import AuthRoutes from "./routes/AuthRoutes.js";
-dotenv.config({ path: "./.env" });
 import morgan from "morgan";
 import User from "./models/UserModel.js";
-import UserRoutes from "./routes/UserRoutes.js";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
+// Routes
+import AuthRoutes from "./routes/AuthRoutes.js";
+import UserRoutes from "./routes/UserRoutes.js";
+import PostRoutes from "./routes/PostRoutes.js";
+import GlobalErrorHandler from "./middleware/GlobalErrorHandler.js";
+import { editPost } from "./controllers/PostController.js";
+
+dotenv.config({ path: "./.env" });
 const app = express();
 
 // Middleware
@@ -72,4 +77,8 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1/posts", PostRoutes);
+
+//error handler
+app.use(GlobalErrorHandler);
 export default app;
