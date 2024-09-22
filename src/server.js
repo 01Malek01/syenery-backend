@@ -14,7 +14,7 @@ const connection = async () => {
   }
 };
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
@@ -22,6 +22,7 @@ const io = new Server(server, {
 });
 
 const onlineUsers = {};
+export const getUserSocketId = (userId) => onlineUsers[userId];
 io.on("connection", (socket) => {
   console.log("a user connected");
 
@@ -31,6 +32,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("privateMessage", ({ senderId, receiverId, content }) => {
+    console.log("sent message", senderId, receiverId, content);
     const receiverIdSocket = onlineUsers[receiverId];
     if (receiverIdSocket) {
       io.to(receiverIdSocket).emit("receiveMessage", {

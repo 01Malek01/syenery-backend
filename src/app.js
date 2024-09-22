@@ -13,8 +13,7 @@ import AuthRoutes from "./routes/AuthRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import PostRoutes from "./routes/PostRoutes.js";
 import GlobalErrorHandler from "./middleware/GlobalErrorHandler.js";
-import { editPost } from "./controllers/PostController.js";
-
+import ChatRoutes from "./routes/ChatRoutes.js";
 dotenv.config({ path: "./.env" });
 const app = express();
 
@@ -78,6 +77,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/user", UserRoutes);
 app.use("/api/v1/posts", PostRoutes);
+app.use("/api/v1/chat", ChatRoutes);
 
 //error handler
 app.use(GlobalErrorHandler);
