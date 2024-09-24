@@ -118,27 +118,43 @@ export const getUserPosts = expressAsyncHandler(async (req, res, next) => {
 
 export const like = expressAsyncHandler(async (req, res, next) => {
   const postId = req.params.postId;
+
   const post = await Post.findById(postId);
   if (!post) {
     res.status(404);
     throw new Error("Post not found");
   }
 
-  post.likes += 1;
+  // Prevent duplicate likes
+  if (post.likes.includes(req?.user?._id)) {
+    res.status(400);
+    throw new Error("You have already liked this post");
+  }
+
+  post.likes.push(req?.user?._id);
   await post.save();
+
   res.status(200).json({ message: "Post liked successfully" });
 });
 
 export const dislike = expressAsyncHandler(async (req, res, next) => {
   const postId = req.params.postId;
+
   const post = await Post.findById(postId);
   if (!post) {
     res.status(404);
     throw new Error("Post not found");
   }
 
-  post.likes -= 1;
+  const likeIndex = post.likes.indexOf(req?.user?._id);
+  if (likeIndex === -1) {
+    res.status(400);
+    throw new Error("You have not liked this post yet");
+  }
+
+  post.likes.splice(likeIndex, 1);
   await post.save();
+
   res.status(200).json({ message: "Post disliked successfully" });
 });
 

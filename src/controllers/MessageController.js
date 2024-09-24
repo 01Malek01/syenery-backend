@@ -2,6 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import Message from "../models/MessageModel.js";
 import Conversation from "../models/ConversationModel.js";
 import { getUserSocketId, io } from "../server.js";
+import Notification from "../models/NotificationModel.js";
 
 export const getMessages = expressAsyncHandler(async (req, res, next) => {
   const senderId = req?.user?._id;
@@ -49,10 +50,19 @@ export const sendMessage = expressAsyncHandler(async (req, res, next) => {
     }
   );
 
+  const notification = new Notification({
+    user: receiverId,
+    type: "message",
+  });
+  await notification.save();
+
   const receiverSocketId = getUserSocketId(receiverId);
   if (receiverSocketId) {
     io.to(receiverSocketId).emit("receiveMessage", {
       newMessage,
+    });
+    io.to(receiverSocketId).emit("messageNotification", {
+      notification,
     });
   }
 });

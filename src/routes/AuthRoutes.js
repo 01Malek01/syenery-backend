@@ -77,6 +77,8 @@ router.get("/check-auth", passport.authenticate("session"), (req, res) => {
       email: req.user.email,
       profilePic: req.user.profilePic,
       bio: req.user.bio,
+      following: req.user.following,
+      followers: req.user.followers,
       isAuthenticated: req.isAuthenticated(),
     });
   } else {

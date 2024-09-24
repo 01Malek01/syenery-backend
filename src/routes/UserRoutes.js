@@ -6,6 +6,9 @@ import {
   uploadProfilePic,
   getUserById,
   getAllUsers,
+  followUser,
+  unFollowUser,
+  getUserNotifications,
 } from "../controllers/UserController.js";
 import { upload } from "../../config/multer.js";
 const router = express.Router();
@@ -39,4 +42,11 @@ router.put(
 
 router.get("/:id/profile", getUserById);
 
+router.patch("/:id/follow", passport.authenticate("session"), followUser);
+router.patch("/:id/unfollow", passport.authenticate("session"), unFollowUser);
+router.get(
+  "/notifications",
+  passport.authenticate("session"),
+  getUserNotifications
+);
 export default router;

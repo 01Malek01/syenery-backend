@@ -32,7 +32,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("privateMessage", ({ senderId, receiverId, content }) => {
-    console.log("sent message", senderId, receiverId, content);
     const receiverIdSocket = onlineUsers[receiverId];
     if (receiverIdSocket) {
       io.to(receiverIdSocket).emit("receiveMessage", {
@@ -42,6 +41,13 @@ io.on("connection", (socket) => {
     } else {
       console.log("User not found");
     }
+  });
+  socket.on("receiveMessage", (data) => {
+    console.log("Message received: ", data.newMessage);
+  });
+
+  socket.on("messageNotification", (data) => {
+    console.log("New message notification: ", data.notification);
   });
 
   socket.on("disconnect", () => {

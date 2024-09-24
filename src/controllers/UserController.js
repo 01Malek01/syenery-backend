@@ -1,5 +1,7 @@
 import User from "../models/UserModel.js";
 import expressAsyncHandler from "express-async-handler";
+import { getUserSocketId, io } from "../server.js";
+import Notification from "../models/NotificationModel.js";
 
 export const getProfile = expressAsyncHandler(async (req, res, next) => {
   const user = await User.findById(req?.user?._id);
@@ -75,3 +77,62 @@ export const getAllUsers = expressAsyncHandler(async (req, res, next) => {
     throw new Error("Users not found");
   }
 });
+
+export const followUser = expressAsyncHandler(async (req, res, next) => {
+  const authUserId = req.user._id;
+  const authUser = await User.findByIdAndUpdate(authUserId, {
+    $push: { following: req.params.id }, //appends a value to an array
+  });
+  const followedUser = await User.findByIdAndUpdate(req.params.id, {
+    $push: { followers: authUserId },
+  });
+
+  if (authUser && followedUser) {
+    const followedUserSocketId = getUserSocketId(req.params.id);
+    if (followedUserSocketId) {
+      io.to(followedUserSocketId).emit("followNotification", {
+        senderId: authUserId,
+        message: `${authUser.name} started following you`,
+      });
+    }
+  } else {
+    res.status(404).message("User not found");
+    throw new Error("User not found");
+  }
+
+  return next();
+});
+
+export const unFollowUser = expressAsyncHandler(async (req, res, next) => {
+  const authUserId = req.user._id;
+  const authUser = await User.findByIdAndUpdate(authUserId, {
+    $pull: { following: req.params.id },
+  });
+  const followedUser = await User.findByIdAndUpdate(req.params.id, {
+    $pull: { followers: authUserId },
+  });
+
+  if (authUser && followedUser) {
+    res.status(200).json({ message: "User unfollowed successfully" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  return next();
+});
+
+export const getUserNotifications = expressAsyncHandler(
+  async (req, res, next) => {
+    const notifications = await Notification.find({
+      user: req.user._id,
+    });
+    if (notifications) {
+      res.json(notifications);
+      return next();
+    } else {
+      res.status(404);
+      throw new Error("Notifications not found");
+    }
+  }
+);
