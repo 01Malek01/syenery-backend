@@ -53,6 +53,7 @@ export const sendMessage = expressAsyncHandler(async (req, res, next) => {
   const notification = new Notification({
     user: receiverId,
     type: "message",
+    message: `${req.user.name} sent you a message`,
   });
   await notification.save();
 

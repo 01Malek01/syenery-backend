@@ -86,9 +86,15 @@ export const followUser = expressAsyncHandler(async (req, res, next) => {
   const followedUser = await User.findByIdAndUpdate(req.params.id, {
     $push: { followers: authUserId },
   });
+  const notification = await Notification.create({
+    user: req.params.id,
+    message: `${authUser.name} started following you`,
+    type: "follow",
+  });
 
   if (authUser && followedUser) {
     const followedUserSocketId = getUserSocketId(req.params.id);
+    console.log("followedUserSocketId", followedUserSocketId);
     if (followedUserSocketId) {
       io.to(followedUserSocketId).emit("followNotification", {
         senderId: authUserId,
@@ -136,3 +142,45 @@ export const getUserNotifications = expressAsyncHandler(
     }
   }
 );
+
+export const clearNotifications = expressAsyncHandler(
+  async (req, res, next) => {
+    const notifications = await Notification.deleteMany({
+      user: req.user._id,
+    });
+    if (notifications) {
+      res.json({ message: "Notifications cleared successfully" });
+      return next();
+    } else {
+      res.status(404);
+      throw new Error("Notifications not found");
+    }
+  }
+);
+
+export const getExplorePeople = expressAsyncHandler(async (req, res, next) => {
+  const users = await User.find({
+    followers: { $ne: req.user._id },
+  });
+  if (users) {
+    res.json(users);
+    return next();
+  } else {
+    res.status(404);
+    throw new Error("Users not found");
+  }
+});
+
+export const getFriends = expressAsyncHandler(async (req, res, next) => {
+  const users = await User.find({
+    _id: { $in: req.user.following }, //ids that are in the followings of the auth user
+    following: { $in: [req.user._id] },
+  });
+  if (users) {
+    res.json(users);
+    return next();
+  } else {
+    res.status(404);
+    throw new Error("Users not found");
+  }
+});

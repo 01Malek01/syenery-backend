@@ -24,7 +24,7 @@ export const io = new Server(server, {
 const onlineUsers = {};
 export const getUserSocketId = (userId) => onlineUsers[userId];
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log("a user connected", socket.id);
 
   socket.on("register", (userId) => {
     onlineUsers[userId] = socket.id;

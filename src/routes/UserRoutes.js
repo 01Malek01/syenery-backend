@@ -9,11 +9,20 @@ import {
   followUser,
   unFollowUser,
   getUserNotifications,
+  clearNotifications,
+  getExplorePeople,
+  getFriends,
 } from "../controllers/UserController.js";
 import { upload } from "../../config/multer.js";
 const router = express.Router();
 
 router.get("/all-users", passport.authenticate("session"), getAllUsers);
+router.get(
+  "/explore-people",
+  passport.authenticate("session"),
+  getExplorePeople
+);
+router.get("/friends", passport.authenticate("session"), getFriends);
 router.get(
   "/profile",
   passport.authenticate("session"),
@@ -44,9 +53,8 @@ router.get("/:id/profile", getUserById);
 
 router.patch("/:id/follow", passport.authenticate("session"), followUser);
 router.patch("/:id/unfollow", passport.authenticate("session"), unFollowUser);
-router.get(
-  "/notifications",
-  passport.authenticate("session"),
-  getUserNotifications
-);
+router
+  .route("/notifications")
+  .get(passport.authenticate("session"), getUserNotifications)
+  .delete(passport.authenticate("session"), clearNotifications);
 export default router;
