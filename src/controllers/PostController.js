@@ -26,7 +26,9 @@ export const createPost = expressAsyncHandler(async (req, res, next) => {
 });
 
 export const getPosts = expressAsyncHandler(async (req, res, next) => {
-  const posts = await Post.find({ private: false }).populate("author");
+  const posts = await Post.find({ private: false })
+    .sort({ createdAt: -1 })
+    .populate("author");
 
   if (posts) {
     res.json(posts);
@@ -107,7 +109,9 @@ export const getUserPosts = expressAsyncHandler(async (req, res, next) => {
     res.status(401);
     throw new Error("Unauthorized");
   }
-  const posts = await Post.find({ author: req.user._id });
+  const posts = await Post.find({ author: req.user._id }).sort({
+    createdAt: -1,
+  });
   if (!posts) {
     res.send("No posts found");
   }
