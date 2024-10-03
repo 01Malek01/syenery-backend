@@ -10,8 +10,10 @@ import {
   getPost,
   getPostComments,
   getPosts,
+  getPostsByUser,
   getUserPosts,
   like,
+  sharePost,
 } from "../controllers/PostController.js";
 const router = express.Router();
 
@@ -25,4 +27,6 @@ router.patch("/:postId/dislike", dislike);
 router.patch("/:postId/comment", createComment);
 router.get("/:postId/comment", getPostComments);
 router.delete("/:postId/comment/:commentId", deleteComment);
+router.get("/:userId/user-posts", getPostsByUser);
+router.post("/:id/share", sharePost);
 export default router;

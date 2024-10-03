@@ -30,6 +30,14 @@ const postSchema = new mongoose.Schema(
         ref: "Comment",
       },
     ],
+    isShared: {
+      type: Boolean,
+      default: false,
+    },
+    sharedFrom: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

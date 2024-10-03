@@ -2,6 +2,7 @@ import User from "../models/UserModel.js";
 import expressAsyncHandler from "express-async-handler";
 import { getUserSocketId, io } from "../server.js";
 import Notification from "../models/NotificationModel.js";
+import Post from "../models/PostModel.js";
 
 export const getProfile = expressAsyncHandler(async (req, res, next) => {
   const user = await User.findById(req?.user?._id);
@@ -184,3 +185,5 @@ export const getFriends = expressAsyncHandler(async (req, res, next) => {
     throw new Error("Users not found");
   }
 });
+
+

@@ -28,7 +28,7 @@ export const createPost = expressAsyncHandler(async (req, res, next) => {
 export const getPosts = expressAsyncHandler(async (req, res, next) => {
   const posts = await Post.find({ private: false })
     .sort({ createdAt: -1 })
-    .populate("author");
+    .populate("author sharedFrom");
 
   if (posts) {
     res.json(posts);
@@ -234,4 +234,36 @@ export const deleteComment = expressAsyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({ message: "Comment deleted successfully" });
+});
+
+export const getPostsByUser = expressAsyncHandler(async (req, res, next) => {
+  const posts = await Post.find({ author: req.params.userId });
+
+  if (posts) {
+    res.json(posts);
+    return next();
+  } else {
+    res.status(404);
+    throw new Error("Posts not found");
+  }
+});
+
+export const sharePost = expressAsyncHandler(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+  const postAuthor = post?.author;
+  console.log("req.user", req.user);
+  if (post) {
+    const newPost = await Post.create({
+      title: post.title,
+      content: post.content,
+      author: req?.user?._id,
+      sharedFrom: postAuthor,
+      isShared: true,
+    });
+    res.status(201).json(newPost);
+    return next();
+  } else {
+    res.status(404);
+    throw new Error("Post not found");
+  }
 });
