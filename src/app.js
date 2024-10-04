@@ -74,6 +74,10 @@ app.use(express.json());
 app.use(cookieParser());
 //initialize passport
 
+app.get("/test", (req, res) => {
+  res.send("test successful");
+});
+
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/user", UserRoutes);
 app.use("/api/v1/posts", PostRoutes);
