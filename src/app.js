@@ -56,11 +56,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 passport.serializeUser((user, done) => {
-  done(null, user.id); // Adjust as per your user model's unique identifier
+  done(null, user._id); //save user id to the session
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
+    //retrieve user from database
     const user = await User.findById(id);
     done(null, user);
   } catch (err) {

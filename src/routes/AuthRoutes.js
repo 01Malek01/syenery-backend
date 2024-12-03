@@ -47,13 +47,33 @@ router.get(
   }
 );
 
-router.post("/login", passport.authenticate("local"), (req, res) => {
-  res.send({
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-  });
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      // Handle unexpected errors
+      return res.status(500).send({ message: "An unexpected error occurred." });
+    }
+    if (!user) {
+      // Handle authentication failure (e.g., user not found or invalid credentials)
+      return res
+        .status(401)
+        .send({ message: `${info.message}` || "Invalid email or password." });
+    }
+
+    // If authentication is successful, log in the user
+    req.logIn(user, (err) => {
+      if (err) {
+        return res.status(500).send({ message: "Failed to log in user." });
+      }
+      return res.send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      });
+    });
+  })(req, res, next);
 });
+
 router.post(
   "/logout",
   expressAsyncHandler(async (req, res, next) => {
@@ -70,6 +90,7 @@ router.post(
 );
 
 router.get("/check-auth", passport.authenticate("session"), (req, res) => {
+  console.log("req", req.user);
   if (req.isAuthenticated()) {
     res.send({
       _id: req.user._id,

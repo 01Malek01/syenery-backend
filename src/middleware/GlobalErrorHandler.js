@@ -8,7 +8,9 @@ const ErrorHandler = (err, req, res, next) => {
   }
   if (err.name === "ValidationError") {
     message = "Validation Failed";
+    
     statusCode = 400;
+    console.log(err);
   }
 
   res.status(statusCode).json({
