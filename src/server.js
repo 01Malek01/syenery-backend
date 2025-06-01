@@ -1,6 +1,6 @@
 import app from "./app.js";
 import mongoose from "mongoose";
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 import http from "http";
 import { Server } from "socket.io";
 const server = http.createServer(app);

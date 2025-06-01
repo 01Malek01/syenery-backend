@@ -18,12 +18,32 @@ dotenv.config({ path: "./.env" });
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    credentials: true,
-    origin: [process.env.FRONTEND_URL],
-  })
-);
+const corsOptions = {
+  credentials: true,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // In development, allow all origins
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // In production, only allow specific origins
+    const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [];
+    if (allowedOrigins.includes(origin) || !origin) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['set-cookie'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 const clientP = mongoose
   .connect(process.env.MONGO_URI)
