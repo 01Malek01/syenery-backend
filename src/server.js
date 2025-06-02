@@ -1,6 +1,6 @@
 import app from "./app.js";
 import mongoose from "mongoose";
-const PORT = 3000;
+const PORT = process.env.PORT || 5000;
 import http from "http";
 import { Server } from "socket.io";
 const server = http.createServer(app);
@@ -19,23 +19,23 @@ const corsOptions = {
     // Allow requests with or without trailing slash
     const allowedOrigins = [
       process.env.FRONTEND_URL,
-      process.env.FRONTEND_URL.endsWith('/') 
+      process.env.FRONTEND_URL.endsWith("/")
         ? process.env.FRONTEND_URL.slice(0, -1)
-        : process.env.FRONTEND_URL + '/'
+        : process.env.FRONTEND_URL + "/",
     ];
-    
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   methods: ["GET", "POST"],
-  credentials: true
+  credentials: true,
 };
 
 export const io = new Server(server, {
-  cors: corsOptions
+  cors: corsOptions,
 });
 
 const onlineUsers = {};
