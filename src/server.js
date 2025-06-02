@@ -15,27 +15,14 @@ const connection = async () => {
 };
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with or without trailing slash
-    const allowedOrigins = [
-      process.env.FRONTEND_URL,
-      process.env.FRONTEND_URL.endsWith("/")
-        ? process.env.FRONTEND_URL.slice(0, -1)
-        : process.env.FRONTEND_URL + "/",
-    ];
-
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST"],
+  origin: '*', // Allow all origins
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 export const io = new Server(server, {
-  cors: corsOptions,
+  cors: corsOptions
 });
 
 const onlineUsers = {};
